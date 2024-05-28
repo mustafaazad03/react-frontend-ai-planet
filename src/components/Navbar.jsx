@@ -17,6 +17,7 @@ const Navbar = () => {
 			await uploadPdf(file);
 		}
 	};
+
 	return (
 		<div className="shadow-nav py-[18px] flex justify-between items-center md:px-14 px-8">
 			<a href="/">

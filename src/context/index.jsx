@@ -17,21 +17,7 @@ const ContextProvider = ({ children }) => {
 		pdf_id: null,
 	});
 
-	const [history, setHistory] = useState([
-		// sample data
-		{
-			question:
-				"Our own Large Language Model (LLM) is a type of Al that can learn from data. We have trained it on 7 billion parameters which makes it better than other LLMs. We are featured on aiplanet.com and work with leading enterprises to help them use Al securely and privately. We have a Generative Al Stack which helps reduce the hallucinations in LLMs and allows enterprises to use Al in their applications.",
-			pdfName: "sample.pdf",
-			response:
-				"Our own Large Language Model (LLM) is a type of Al that can learn from data. We have trained it on 7 billion parameters which makes it better than other LLMs. We are featured on aiplanet.com and work with leading enterprises to help them use Al securely and privately. We have a Generative Al Stack which helps reduce the hallucinations in LLMs and allows enterprises to use Al in their applications.",
-		},
-		{
-			question: "What is the capital of USA?",
-			pdfName: "sample.pdf",
-			response: "Washington D.C.",
-		},
-	]);
+	const [history, setHistory] = useState([]);
 
 	useEffect(() => {
 		const pdfMetadata = localStorage.getItem("pdfMetaData");
@@ -50,16 +36,27 @@ const ContextProvider = ({ children }) => {
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
-
 			if (pdfMetaData.pdf_id !== null && pdfMetaData.pdf_id !== undefined) {
 				await axios.delete(
-					`${process.env.BACKEND_URI}/delete-pdf/${pdfMetaData.pdf_id}`
+					`${import.meta.env.VITE_BACKEND_URI}/delete-pdf/${pdfMetaData.pdf_id}`
 				);
 			}
 
-			const res = await axios.post("/upload-pdf/", formData);
-			setPdfMetaData(res.data);
+			const res = await axios.post(
+				`${import.meta.env.VITE_BACKEND_URI}/upload-pdf/`,
+				formData
+			);
+			if (res.data.error) {
+				throw new Error(res.data.error);
+			}
+			const { filename, pdf_id } = res.data;
+			setPdfMetaData({ name: filename, pdf_id });
+			localStorage.setItem(
+				"pdfMetaData",
+				JSON.stringify({ name: filename, pdf_id })
+			);
 			setHistory([]);
+			localStorage.removeItem("chatHistory");
 		} catch (error) {
 			console.error("Error uploading PDF:", error);
 		} finally {
@@ -76,16 +73,23 @@ const ContextProvider = ({ children }) => {
 		const historySubset = history.slice(-2);
 
 		try {
-			const res = await axios.post(`${process.env.BACKEND_URI}/ask-question/`, {
-				pdf_id: pdfMetaData.pdf_id,
-				question,
-				history: historySubset,
-			});
+			const res = await axios.post(
+				`${import.meta.env.VITE_BACKEND_URI}/ask-question/`,
+				{
+					pdf_id: pdfMetaData.pdf_id,
+					question,
+					history: historySubset,
+				}
+			);
 
-			setHistory((prev) => [
-				...prev,
-				{ question, pdfName: pdfMetaData.name, response: res.data.answer },
-			]);
+			const newEntry = {
+				question,
+				pdfName: pdfMetaData.name,
+				response: res.data.answer,
+			};
+			const newHistory = [...history, newEntry];
+			setHistory(newHistory);
+			localStorage.setItem("chatHistory", JSON.stringify(newHistory));
 
 			const words = res.data.answer.split(" ");
 			words.forEach((word, index) => delayyPara(index, word + " "));
@@ -93,7 +97,7 @@ const ContextProvider = ({ children }) => {
 			console.error("Error asking question:", error);
 		} finally {
 			setLoading(false);
-			newPrompt("");
+			setNewPrompt("");
 			setResponse("");
 		}
 	};
