@@ -17,5 +17,7 @@ module.exports = {
 		"react/prop-types": "off",
 		"react/jsx-no-useless-fragment": "off",
 		"react/jsx-fragments": ["error", "element"],
+		"no-mixed-spaces-and-tabs": "off",
+		"no-undef": "off",
 	},
 };
