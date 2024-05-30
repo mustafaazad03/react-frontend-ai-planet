@@ -137,6 +137,7 @@ const ContextProvider = ({ children }) => {
 		newResponseArray.forEach((word, index) => {
 			delayPara(index, word + " ");
 		});
+		setResponse(null);
 		setInput("");
 	};
 

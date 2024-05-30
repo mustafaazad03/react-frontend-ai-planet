@@ -120,10 +120,12 @@ const Chat = () => {
 											<img src={aiLogo} alt="AI Logo" />
 										</div>
 										<div className="p-2 rounded-lg text-wrap max-w-full  w-11/12 text-sm sm:text-base">
-											<p
-												dangerouslySetInnerHTML={{ __html: response }}
-												className="flex flex-wrap text-wrap  w-11/12 relative left-6"
-											></p>
+											{response !== null && (
+												<p
+													dangerouslySetInnerHTML={{ __html: response }}
+													className="flex flex-wrap text-wrap  w-11/12 relative left-6"
+												></p>
+											)}
 										</div>
 									</div>
 								)}
