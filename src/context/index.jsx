@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useContext, useEffect, useState, createContext } from "react";
+import toast from "react-hot-toast";
 
 export const Context = createContext();
 
@@ -23,12 +24,16 @@ const ContextProvider = ({ children }) => {
 
 	useEffect(() => {
 		const fetchHistory = async (pdf_id) => {
+			toast.loading("Fetching history...");
 			try {
 				const response = await axios.get(
 					`${import.meta.env.VITE_BACKEND_URI}/get-history/${pdf_id}`
 				);
+				toast.dismiss();
+				toast.success("History fetched successfully");
 				setHistory(response.data.history);
 			} catch (error) {
+				toast.error("Error fetching history");
 				console.error("Error fetching history:", error);
 			}
 		};
@@ -39,25 +44,29 @@ const ContextProvider = ({ children }) => {
 	}, [pdfMetaData.pdf_id]);
 
 	const uploadPdf = async (file) => {
+		if (file.type !== "application/pdf") {
+			toast.error("Unsupported file type. Please upload a PDF file.");
+			throw new Error("Unsupported file type. Please upload a PDF file.");
+		}
+		toast.loading("Uploading PDF...");
 		setLoading(true);
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
-			// if pdf file is more than 5MB then return
+
 			if (file.size > 5 * 1024 * 1024) {
+				toast.error("File size should be less than 5MB");
 				throw new Error("File size should be less than 5MB");
 			}
-			if (
-				pdfMetaData.pdf_id !== null &&
-				pdfMetaData.pdf_id !== undefined &&
-				pdfMetaData.name !== file.name
-			) {
+
+			if (pdfMetaData.pdf_id && pdfMetaData.name !== file.name) {
 				try {
 					await axios.delete(
 						`${import.meta.env.VITE_BACKEND_URI}/delete-pdf/${
 							pdfMetaData.pdf_id
 						}`
 					);
+					toast.success("Previous PDF deleted successfully");
 					console.log("Previous PDF deleted");
 					setPdfMetaData({ name: null, pdf_id: null });
 					localStorage.removeItem("pdfMetaData");
@@ -65,6 +74,7 @@ const ContextProvider = ({ children }) => {
 					setInput("");
 					setResponse(null);
 				} catch (error) {
+					toast.error("Error deleting previous PDF");
 					throw new Error("Error deleting previous PDF");
 				}
 			}
@@ -73,9 +83,11 @@ const ContextProvider = ({ children }) => {
 				`${import.meta.env.VITE_BACKEND_URI}/upload-pdf/`,
 				formData
 			);
+
 			if (res.data.error) {
 				throw new Error(res.data.error);
 			}
+
 			const { filename, pdf_id } = res.data;
 			setPdfMetaData({ name: filename, pdf_id });
 			localStorage.setItem(
@@ -84,6 +96,7 @@ const ContextProvider = ({ children }) => {
 			);
 			setHistory([]);
 		} catch (error) {
+			toast.error("Error uploading PDF");
 			console.error("Error uploading PDF:", error);
 		} finally {
 			setLoading(false);
@@ -95,6 +108,7 @@ const ContextProvider = ({ children }) => {
 		setNewPrompt(question);
 		setResponse(null);
 		setLoading(true);
+		toast.loading("Asking question...");
 		setShowResult(true);
 		setInput("");
 
@@ -109,17 +123,23 @@ const ContextProvider = ({ children }) => {
 					history: historySubset,
 				}
 			);
+			toast.dismiss();
+
+			toast.success("Your Response is ready!");
 			displayResponseWithAnimation(res.data.answer);
+
 			const newEntry = {
 				question: newPrompt,
 				pdfName: pdfMetaData.name,
 				response: res.data.answer,
 			};
+
 			const newHistory = [...history, newEntry];
-			setShowResult(false);
 			setResponse(null);
+			setShowResult(false);
 			setHistory(newHistory);
 		} catch (error) {
+			toast.error("Error asking question");
 			console.error("Error asking question:", error);
 		}
 	};
@@ -127,7 +147,7 @@ const ContextProvider = ({ children }) => {
 	const delayPara = (index, nextWord) => {
 		setTimeout(() => {
 			setResponse((prev) => prev + nextWord);
-		}, 100 * index);
+		}, 60 * index);
 	};
 
 	const displayResponseWithAnimation = (formattedResponse) => {
@@ -137,8 +157,8 @@ const ContextProvider = ({ children }) => {
 		newResponseArray.forEach((word, index) => {
 			delayPara(index, word + " ");
 		});
-		setResponse(null);
 		setInput("");
+		setResponse(null);
 	};
 
 	const contextValues = {

@@ -3,6 +3,7 @@ import fileIcon from "../assets/file.svg";
 import { useAppContext } from "../context";
 import addIcon from "../assets/add.svg";
 import { useRef } from "react";
+import toast from "react-hot-toast";
 const Navbar = () => {
 	const { pdfMetaData, uploadPdf } = useAppContext();
 	const fileInputRef = useRef(null);
@@ -15,6 +16,7 @@ const Navbar = () => {
 		const file = event.target.files[0];
 		if (file) {
 			await uploadPdf(file);
+			toast.dismiss();
 		}
 	};
 
