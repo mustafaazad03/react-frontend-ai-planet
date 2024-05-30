@@ -1,5 +1,7 @@
 # PDF Chat Application with AI Integration (Frontend)
 
+https://github.com/mustafaazad03/react-frontend-ai-planet/assets/97380192/ba050d69-fe1e-4571-afaa-0fa8e295f0d2
+
 This repository contains the frontend code for a chat application that integrates AI functionalities. The application allows users to upload PDF files, ask questions about the content, and receive responses from an AI model. It also handles online status, loading states, and displays chat history.
 
 ## Backend Repository
