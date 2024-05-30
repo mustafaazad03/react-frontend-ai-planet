@@ -9,6 +9,9 @@ export default {
 			},
 			colors: {
 				primary: "#0FA958",
+				chatBg: "#B0ACE9",
+				chatBorder: "#E4E8EE",
+				placeholder: "#6E7583",
 			},
 			fontFamily: {
 				inter: ["Inter", "sans-serif"],
