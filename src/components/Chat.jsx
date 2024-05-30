@@ -50,12 +50,14 @@ const Chat = () => {
 		scrollToBottom();
 	}, [history, showResult]);
 
+	// update the chat history with the latest response
+
 	return (
 		<div className="flex flex-col h-[90vh] pt-11 overflow-hidden w-5/6 mx-auto">
 			<div className="flex flex-1 overflow-y-scroll w-full mx-auto text-wrap break-words overflow-x-hidden">
 				{pdfMetaData.pdf_id && (
 					<div className="flex-col space-y-8 flex max-w-full w-full">
-						{history?.map((item, index) => (
+						{history.map((item, index) => (
 							<div
 								key={index}
 								className="flex flex-col my-2 justify-start border-b border-chatBorder pb-10 rounded-lg"
@@ -65,7 +67,7 @@ const Chat = () => {
 										{pdfMetaData?.name[0]}
 									</div>
 									<div className="rounded-lg flex flex-wrap max-w-full text-wrap w-11/12 text-sm sm:text-base relative left-6">
-										{item?.question}
+										{item.question || newPrompt}
 									</div>
 								</div>
 								<div

@@ -105,12 +105,12 @@ const ContextProvider = ({ children }) => {
 
 	const askQuestion = async (question) => {
 		if (loading) return;
+		setInput("");
 		setNewPrompt(question);
 		setResponse(null);
 		setLoading(true);
 		toast.loading("Asking question...");
 		setShowResult(true);
-		setInput("");
 
 		const historySubset = history.slice(-3);
 
@@ -135,9 +135,9 @@ const ContextProvider = ({ children }) => {
 			};
 
 			const newHistory = [...history, newEntry];
-			setResponse(null);
 			setShowResult(false);
 			setHistory(newHistory);
+			setResponse(null);
 		} catch (error) {
 			toast.error("Error asking question");
 			console.error("Error asking question:", error);
@@ -157,7 +157,6 @@ const ContextProvider = ({ children }) => {
 		newResponseArray.forEach((word, index) => {
 			delayPara(index, word + " ");
 		});
-		setInput("");
 		setResponse(null);
 	};
 
