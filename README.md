@@ -2,6 +2,10 @@
 
 This repository contains the frontend code for a chat application that integrates AI functionalities. The application allows users to upload PDF files, ask questions about the content, and receive responses from an AI model. It also handles online status, loading states, and displays chat history.
 
+## Backend Repository
+
+The backend code for this application can be found [here](https://github.com/mustafaazad03/fast-API-backend-AI-Planet). The backend is built using FastAPI and provides endpoints for uploading PDFs, asking questions, and fetching responses from the AI model.
+
 ## Table of Contents
 
 - [Tech Stack](#tech-stack)
