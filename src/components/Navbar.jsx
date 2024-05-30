@@ -32,7 +32,7 @@ const Navbar = () => {
 							className="mr-2 p-2 border rounded-sm border-primary/45"
 						/>
 						<p className="text-sm text-primary font-medium">
-							{pdfMetaData.name.length > 8
+							{pdfMetaData?.name?.length > 12
 								? pdfMetaData.name.slice(0, 8) +
 								  "..." +
 								  pdfMetaData.name.slice(-4)
